@@ -4,7 +4,7 @@
 // Permission to use, copy, modify, and/or distribute this software for any
 // purpose with or without fee is hereby granted, provided that the above
 // copyright notice and this permission notice appear in all copies.
-// 
+//
 // THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
 // WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
 // MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
@@ -24,7 +24,7 @@ const
         ellipsis: '\u2026',
         tag: function (tagName, className, text) {
             let t = document.createElement(tagName);
-            t.className = className;
+            if (className) t.className = className;
             if (text) t.innerText = text;
             return t;
         },
@@ -56,10 +56,9 @@ export class ASN1DOM extends ASN1 {
     toDOM(spaces) {
         spaces = spaces || '';
         let isOID = (typeof oids === 'object') && (this.tag.isUniversal() && (this.tag.tagNumber == 0x06) || (this.tag.tagNumber == 0x0D));
-        let node = DOM.tag('div', 'node');
+        let node = DOM.tag('li');
         node.asn1 = this;
         let head = DOM.tag('span', 'head');
-        head.appendChild(DOM.tag('span', 'spaces', spaces));
         const typeName = this.typeName().replace(/_/g, ' ');
         if (this.def) {
             if (this.def.id) {
@@ -111,8 +110,26 @@ export class ASN1DOM extends ASN1 {
             content = content.replace(/</g, '&lt;');
             content = content.replace(/\n/g, '<br>');
         }
-        node.appendChild(head);
-        this.node = node;
+        // add the li and details section for this node
+        let contentNode;
+        let childNode;
+        if (this.sub !== null) {
+            let details = document.createElement('details');
+            details.setAttribute('open', '');
+            node.appendChild(details);
+            let summary = document.createElement('summary');
+            summary.setAttribute('class', 'node');
+            details.appendChild(summary);
+            summary.appendChild(head);
+            // summary.setAttribute('class', 'node');
+            contentNode = summary;
+            childNode = details;
+        } else {
+            contentNode = node;
+            contentNode.setAttribute('class', 'node');
+            contentNode.appendChild(head);
+        }
+        this.node = contentNode;
         this.head = head;
         let value = DOM.tag('div', 'value');
         let s = 'Offset: ' + this.stream.pos + '<br>';
@@ -135,14 +152,14 @@ export class ASN1DOM extends ASN1 {
             }
         }
         value.innerHTML = s;
-        node.appendChild(value);
-        let sub = DOM.tag('div', 'sub');
+        contentNode.appendChild(value);
         if (this.sub !== null) {
+            let sub = DOM.tag('ul');
+            childNode.appendChild(sub);
             spaces += '\xA0 ';
             for (let i = 0, max = this.sub.length; i < max; ++i)
                 sub.appendChild(this.sub[i].toDOM(spaces));
         }
-        node.appendChild(sub);
         bindContextMenu(node);
         return node;
     }
@@ -169,13 +186,14 @@ export class ASN1DOM extends ASN1 {
         this.head.onmouseover = function () { this.hexNode.className = 'hexCurrent'; };
         this.head.onmouseout  = function () { this.hexNode.className = 'hex'; };
         node.asn1 = this;
-        node.onmouseover = function () {
+        node.onmouseover = function (event) {
             let current = !root.selected;
             if (current) {
                 root.selected = this.asn1;
                 this.className = 'hexCurrent';
             }
             this.asn1.fakeHover(current);
+            event.stopPropagation();
         };
         node.onmouseout = function () {
             let current = (root.selected == this.asn1);
