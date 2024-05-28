@@ -1,8 +1,9 @@
 #!/bin/sh
 set -e
 FILES="
-  asn1.js oids.js defs.js base64.js hex.js int10.js dom.js rfcdef.js test.js tags.js
-  context.js index.css index-dark.css index.js index.html index-local.html
+  asn1.js oids.js defs.js base64.js hex.js int10.js dom.js context.js theme.js
+  rfcdef.js test.js tags.js
+  index.html index.css index.js index-local.html
   favicon.svg tree-icon-light.svg tree-icon-dark.svg
   README.md LICENSE
   updateOID.sh check.sh
