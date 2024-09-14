@@ -93,7 +93,7 @@ class Stream {
         for (let i = start; i < end; ++i) {
             if (type == 'byte' && i > start)
                 s += ' ';
-            s += this.hexByte(this.get(i));
+            s += Stream.hexByte(this.get(i));
             if (type == 'dump')
                 switch (i & 0xF) {
                 case 0x7: s += '  '; break;
@@ -288,7 +288,7 @@ class Stream {
             end = start + maxLength;
         s = '';
         for (let i = start; i < end; ++i)
-            s += this.hexByte(this.get(i));
+            s += Stream.hexByte(this.get(i));
         if (len > maxLength)
             s += ellipsis;
         return { size: len, str: s };
