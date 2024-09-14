@@ -60,15 +60,26 @@ function checkPrintable(s) {
  * It uses an existing array or binary string and advances a position index. */
 class Stream {
 
+    /**
+     * @param {Stream|array|string} enc data (will not be copied)
+     * @param {?number} pos starting position (mandatory when `end` is not a Stream)
+     */
     constructor(enc, pos) {
         if (enc instanceof Stream) {
             this.enc = enc.enc;
             this.pos = enc.pos;
         } else {
-            // enc should be an array or a binary string
             this.enc = enc;
             this.pos = pos;
         }
+        if (typeof this.pos != 'number')
+            throw new Error('"pos" must be a numeric value');
+        if (typeof this.enc == 'string')
+            this.getRaw = pos => this.enc.charCodeAt(pos);
+        else if (typeof this.enc[0] == 'number')
+            this.getRaw = pos => this.enc[pos];
+        else
+            throw new Error('"enc" must be a numeric array or a string');
     }
     /** Get the byte at current position (and increment it) or at a specified position (and avoid moving current position).
      * @param {?number} pos read position if specified, else current position (and increment it) */
@@ -77,7 +88,7 @@ class Stream {
             pos = this.pos++;
         if (pos >= this.enc.length)
             throw new Error('Requesting byte offset ' + pos + ' on a stream of length ' + this.enc.length);
-        return (typeof this.enc == 'string') ? this.enc.charCodeAt(pos) : this.enc[pos];
+        return this.getRaw(pos);
     }
     /** Convert a single byte to an hexadcimal string (of length 2).
      * @param {number} b */
