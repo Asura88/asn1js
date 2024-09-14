@@ -56,6 +56,8 @@ function checkPrintable(s) {
     }
 }
 
+/** Class to manage a stream of bytes, with a zero-copy approach.
+ * It uses an existing array or binary string and advances a position index. */
 class Stream {
 
     constructor(enc, pos) {
@@ -68,6 +70,8 @@ class Stream {
             this.pos = pos;
         }
     }
+    /** Get the byte at current position (and increment it) or at a specified position (and avoid moving current position).
+     * @param {?number} pos read position if specified, else current position (and increment it) */
     get(pos) {
         if (pos === undefined)
             pos = this.pos++;
@@ -75,11 +79,15 @@ class Stream {
             throw new Error('Requesting byte offset ' + pos + ' on a stream of length ' + this.enc.length);
         return (typeof this.enc == 'string') ? this.enc.charCodeAt(pos) : this.enc[pos];
     }
-    hexByte(b) {
+    /** Convert a single byte to an hexadcimal string (of length 2).
+     * @param {number} b */
+    static hexByte(b) {
         return hexDigits.charAt((b >> 4) & 0xF) + hexDigits.charAt(b & 0xF);
     }
-    /** Hexadecimal dump.
-     * @param type 'raw', 'byte' or 'dump' */
+    /** Hexadecimal dump of a specified region of the stream.
+     * @param {number} start starting position (included)
+     * @param {number} end ending position (excluded)
+     * @param {string} type 'raw', 'byte' or 'dump' */
     hexDump(start, end, type = 'dump') {
         let s = '';
         for (let i = start; i < end; ++i) {
@@ -95,6 +103,9 @@ class Stream {
         }
         return s;
     }
+    /** Base-64 dump of a specified region of the stream.
+     * @param {number} start starting position (included)
+     * @param {number} end ending position (excluded) */
     b64Dump(start, end) {
         let extra = (end - start) % 3,
             s = '',
