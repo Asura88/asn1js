@@ -129,6 +129,7 @@ Defs.RFC = rfcdef;
 Defs.commonTypes = [
     [ 'X.509 certificate', '1.3.6.1.5.5.7.0.18', 'Certificate' ], 
     [ 'X.509 public key info', '1.3.6.1.5.5.7.0.18', 'SubjectPublicKeyInfo' ],
+    [ 'X.509 certificate revocation list', '1.3.6.1.5.5.7.0.18', 'CertificateList' ], 
     [ 'CMS / PKCS#7 envelope', '1.2.840.113549.1.9.16.0.14', 'ContentInfo' ],
     [ 'PKCS#1 RSA private key', '1.2.840.113549.1.1.0.1', 'RSAPrivateKey' ],
     [ 'PKCS#8 encrypted private key', '1.2.840.113549.1.8.1.1', 'EncryptedPrivateKeyInfo' ],
