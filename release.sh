@@ -7,7 +7,7 @@ FILES="
   favicon.svg tree-icon-light.svg tree-icon-dark.svg
   README.md LICENSE
   updateOID.sh check.sh
-  examples/*
+  examples
 "
 mtn automate tags 'it.lapo.asn1js{,.*}' | \
   awk '/^revision/ { print substr($2, 2, length($2) - 2)}' | \
@@ -30,6 +30,6 @@ chmod 644 examples/*
 type gsha256sum >/dev/null 2>/dev/null && SHA256=gsha256sum || SHA256=sha256sum
 pnpm build
 cp dist/index.html index-local.html
-$SHA256 -t $FILES | gpg --clearsign > sha256sums.asc
+$SHA256 -t $FILES examples/* | gpg --clearsign > sha256sums.asc
 7z a -tzip -mx=9 asn1js.zip $FILES sha256sums.asc
 rsync -Pvrtz asn1js.zip $FILES lapo.it:www/asn1js/
